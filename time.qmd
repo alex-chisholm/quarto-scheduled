@@ -1,0 +1,14 @@
+---
+title: "Scheduled Quarto Job on Connect Cloud"
+---
+
+## Quarto
+
+
+```{r}
+
+now <- Sys.time()
+
+```
+
+This doc was last rendered at `r now`.
