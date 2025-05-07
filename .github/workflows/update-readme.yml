@@ -1,9 +1,9 @@
-name: Update README every 5 minutes
+name: Update README every 1 minute
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
-  workflow_dispatch:       # Allows manual triggering
+    - cron: '*/1 * * * *'
+  workflow_dispatch:
 
 jobs:
   update-readme:
@@ -13,27 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
-
-      - name: Install dependencies
-        run: Rscript -e "install.packages('lubridate', repos='https://cloud.r-project.org')"
-
-      - name: Update README with timestamp
+      - name: Update README with current timestamp
         run: |
-          Rscript -e "
-            now <- Sys.time()
-            timezone <- Sys.timezone()
-            content <- paste0('Last Deployed: ', now, ' ', timezone, '\n')
-            writeLines(content, 'README.md')
-          "
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S %Z')
+          echo "Last Deployed: $TIMESTAMP" > README.md
 
-      - name: Commit and push changes
+      - name: Commit and push if changed
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git add README.md
-          git diff --quiet && git diff --staged --quiet || git commit -m 'Update README timestamp'
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update README timestamp"
           git push
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
